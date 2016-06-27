@@ -1,14 +1,13 @@
 
 module.exports = function(app, express){
+  var websiteController = require('../controllers/websiteController.js');
+  console.log('routing')
 
-  var websiteRouter = express.Router();
-  var websiteController = require('./../controllers/websiteController.js');
-
-  websiteRouter.route('/newWebsite')
+  app.route('/newWebsite')
     .post(websiteController.newWebsite);
 
   
-  websiteRouter.route('/checkWebsite')
+  app.route('/checkWebsite')
     .get(websiteController.checkWebsite);
 
 };

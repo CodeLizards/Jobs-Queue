@@ -1,11 +1,18 @@
-app.post('/newjob', function(req, res) {
-  var url = req.body;
-  
-});
+var redisClient = require('../db/redis.js');
+var jobIndex = 0;
 
 exports.newWebsite = function(req, res) {
   // add to the jobs queue
-  // send back the id to the user
+    var job = [jobIndex, req.body.url];
+    job = JSON.stringify(job);
+    redisClient.rpush('jobsQueue', job, function(err, reply){
+      if (err) {
+        return console.log('Error pushing job to jobQueue in Redis');
+      }
+      return reply;
+    });
+    res.json(jobIndex);
+    jobIndex++;
 }
 
 exports.checkWebsite = function(req, res) {

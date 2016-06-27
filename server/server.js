@@ -1,9 +1,13 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var request = require('request');
 var app = express();
 var port = process.env.PORT || 3000;
-
+var cron = require('cron');
+var jobsWorker = require('./utils/processJobsWorker.js');
+var cronJob = cron.job('*/30 * * * * *', function() {
+  jobsWorker();
+});
+cronJob.start();
 // app.use(express.static(`${__dirname}/../client/`));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -11,8 +15,6 @@ app.use(bodyParser.json());
 // Routing requests to put in a newJob
 require('./routes/websiteRouter.js')(app, express);
 
-
-app.get('/new', d)
 
 app.listen(port, function(err){
   if(err){
