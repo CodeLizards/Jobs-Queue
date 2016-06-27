@@ -1,28 +1,27 @@
 var redisClient = require('../db/redis.js');
 var request = require('request');
+var websiteMethods = require('../controllers/mongodbController.js');
 
 
-module.exports = function(){
-  redisClient.lrange('jobsQueue', 0, 10, function(err, reply) {
-    if(err) {
-      console.log(err);
-    }else{
-      console.log('reply', reply);
-    }
-  })
-};
-
-var getContent = function(url){
+var getContent = function(id, url){
   request('http://'+url, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      console.log('body', body); 
+      websiteMethods.storeWebsite(id, url, body);
     } else {
-      console.log('url', url);
-      res.send(404);
+      console.log('Could not get html from website');
     }
   });
 };
 
-var storeWebsite = function(req, res) {
-
+module.exports = function(){
+  redisClient.lpop('jobsQueue', function(err, reply) {
+    if (reply) {
+      var website = JSON.parse(reply);
+      var id = website[0];
+      var url = website[1];
+      getContent(id, url);
+    } else {
+      console.log('no websites have been entered');
+    }
+  })
 };

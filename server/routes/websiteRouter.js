@@ -7,7 +7,7 @@ module.exports = function(app, express){
     .post(websiteController.newWebsite);
 
   
-  app.route('/checkWebsite')
+  app.route('/checkWebsite/:id')
     .get(websiteController.checkWebsite);
 
 };
