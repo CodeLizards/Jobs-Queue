@@ -36,7 +36,6 @@ exports.checkWebsite = function(req, res) {
 
 }
 
-
 var findPosition = function(id, callback){
   var position = null;
   redisClient.llen('jobsQueue', function(err, reply){
