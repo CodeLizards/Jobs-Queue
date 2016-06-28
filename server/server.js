@@ -7,7 +7,7 @@ var cron = require('cron');
 var jobsWorker = require('./utils/processJobsWorker.js');
 
 // start cronJob to have background process write jobs to the db
-var cronJob = cron.job('*/5 * * * * *', function() {
+var cronJob = cron.job('*/55 * * * * *', function() {
   jobsWorker();
 });
 cronJob.start();

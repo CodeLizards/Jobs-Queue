@@ -18,12 +18,41 @@ exports.newWebsite = function(req, res) {
 
 exports.checkWebsite = function(req, res) {
   // check if job id is in db
-  mongodbController.getWebsite(req.params.id, function(err, website){
+  var id = req.params.id;
+  mongodbController.getWebsite(id, function(err, website){
     if (website) {
       res.json(website);
     } else {
-      res.json("The website has not yet been archived! Hang tight.");
+      findPosition(id, function(position) {
+        // return position in job queue
+        if (position === null) {
+          res.json("No such job is in the queue!")
+        } else {
+          res.json("The website has not yet been archived! It is " + position + " away from being processed. Hang tight.");
+        }
+      });
     }
   });
 
 }
+
+
+var findPosition = function(id, callback){
+  var position = null;
+  redisClient.llen('jobsQueue', function(err, reply){
+    if (err) {
+      return "There was an error finding the position in the jobsQueue "+err;
+    }
+    redisClient.lrange('jobsQueue', 0, reply, function(err, replies){
+      if (replies) {
+        for(var i = 0; i < replies.length; i++) {
+          if (JSON.parse(replies[i])[0] == id) {
+            position = i;
+            console.log('position', position);
+          }
+        }
+      }
+      callback(position);
+    });
+  });
+};
