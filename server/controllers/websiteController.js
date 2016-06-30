@@ -15,6 +15,7 @@ exports.newWebsite = function(req, res) {
     return reply;
   });
   // send back the jobId to user so they can retreive results
+  res.status(200);
   res.json(jobID);
   // incrament jobID for the next job's ID. 
   jobID++;

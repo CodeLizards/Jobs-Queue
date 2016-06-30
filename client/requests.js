@@ -1,6 +1,7 @@
 $( document ).ready(function() {
     console.log( "ready!" );
-   
+
+// handle input of new job
 $( "#new-website-form" ).submit(function(e) {
   e.preventDefault();
   var website = $("input:first").val();
@@ -32,6 +33,7 @@ $( "#new-website-form" ).submit(function(e) {
   });
 });
 
+// Handle input of id to get results of job
 $( "#website-status" ).submit(function (e) {
   e.preventDefault();
   var jobId = $("#status-input").val();
@@ -46,11 +48,9 @@ $( "#website-status" ).submit(function (e) {
       url: 'http://localhost:3000/checkWebsite/'+jobId,
       success: function (results) {
         var message = '';
-        console.log('results',results)
         if (results.position === null) {
           message = "No such job has been entered."
         } else if (results.position >= 0) {
-          console.log('position')
           message = "The website has not yet been archived! It is " + results.position + " away from being processed. Hang tight.";
         } else {
           message = "The results for job #"+ results.id +" and website " + results.url + " is: " + results.content; 
