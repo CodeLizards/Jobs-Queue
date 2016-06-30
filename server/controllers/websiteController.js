@@ -1,10 +1,12 @@
 var redisClient = require('../db/redis.js');
 var mongodbController = require('./mongodbController.js')
-var jobIndex = 0;
+var jobID = 0;
 
+// Function that adds new website to the Job Queue to be processed
 exports.newWebsite = function(req, res) {
-  // add to the jobs queue
-  var job = [jobIndex, req.body.url];
+  // add job stringified array with jobId and website
+  // to the jobs queue in redis queue
+  var job = [jobID, req.body.url];
   job = JSON.stringify(job);
   redisClient.rpush('jobsQueue', job, function(err, reply){
     if (err) {
@@ -12,42 +14,43 @@ exports.newWebsite = function(req, res) {
     }
     return reply;
   });
-  res.json(jobIndex);
-  jobIndex++;
+  // send back the jobId to user so they can retreive results
+  res.json(jobID);
+  // incrament jobID for the next job's ID. 
+  jobID++;
 }
 
+// Function to retreive results / status of particular job
 exports.checkWebsite = function(req, res) {
   // check if job id is in db
   var id = req.params.id;
-  mongodbController.getWebsite(id, function(err, website){
+  mongodbController.getWebsite(id, function(err, website) {
+    // if found, send back the results
     if (website) {
       res.json(website);
+    // otherwise it is still processing
     } else {
+      // find its position in the queue
       findPosition(id, function(position) {
-        // return position in job queue
-        if (position === null) {
-          res.json("No such job is in the queue!")
-        } else {
-          res.json("The website has not yet been archived! It is " + position + " away from being processed. Hang tight.");
-        }
+          res.json({ position: position });
       });
     }
   });
 
 }
 
+// Function to search the queue for the position of the job
 var findPosition = function(id, callback){
   var position = null;
   redisClient.llen('jobsQueue', function(err, reply){
     if (err) {
-      return "There was an error finding the position in the jobsQueue "+err;
+      return "There was an error finding the length of the jobsQueue " + err;
     }
     redisClient.lrange('jobsQueue', 0, reply, function(err, replies){
       if (replies) {
         for(var i = 0; i < replies.length; i++) {
           if (JSON.parse(replies[i])[0] == id) {
             position = i;
-            console.log('position', position);
           }
         }
       }

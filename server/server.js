@@ -6,26 +6,33 @@ var mongoose = require('mongoose');
 var cron = require('cron');
 var jobsWorker = require('./utils/processJobsWorker.js');
 
-// start cronJob to have background process write jobs to the db
-var cronJob = cron.job('*/55 * * * * *', function() {
+/* 
+start cronJob to have background
+process read from queue in redis
+get the website content
+then store in the persistant db
+*/
+var cronJob = cron.job('*/15 * * * * *', function() {
   jobsWorker();
 });
 cronJob.start();
 
+// SERVE UP CLIENT FILES
+app.use(express.static(__dirname+'/../client/'));
 
-// app.use(express.static(`${__dirname}/../client/`));
+// MIDDLEWARE
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-//connect the db
+// INITIALIZE CONNECTION WITH DATABASE
 mongoose.connect('mongodb://localhost/mydb');
 
 
-// Routing requests to put in a newJob
+// ROUTING
 require('./routes/websiteRouter.js')(app, express);
 
-
+// START SERVER
 app.listen(port, function(err){
   if(err){
     return console.log('server cannot connect', err);
