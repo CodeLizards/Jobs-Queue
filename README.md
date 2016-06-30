@@ -84,5 +84,5 @@ There are two API endpoints that recieve websites for jobs and return status or 
 | /websiteStatus/:jobId | GET | Returns a JSON object with keys, "url", "id","_id", "content", containing the url requested, the jobId, and the html of the website if the job has been completed, otherwise it returns the status of the job |  
 
 ## High Level Architecture
-![Sorry, the architecture image cannot be displayed. View it at http://i.imgur.com/QCvItta.png](http://i.imgur.com/QCvItta.png)
+![Sorry, the architecture image cannot be displayed. View it at http://i.imgur.com/imY0i6h.png](http://i.imgur.com/imY0i6h.png)
 
